@@ -1,0 +1,16 @@
+import ProjectDescription
+import ProjectDescriptionHelpers
+
+let project = Project.framework(
+    name: "{{ name }}",
+    targets: uFeatureTarget.set,
+    actions: [],
+    packages: [],
+    externalDependencies: [],
+    internalDependencies: [],
+    sdks: [],
+    resources: [
+        .glob(pattern: "**/*.xib"),
+    ],
+    additionalPlistRows: [:])
+

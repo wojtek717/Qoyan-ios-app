@@ -1,76 +1,154 @@
 import ProjectDescription
 
-/// Project helpers are functions that simplify the way you define your project.
-/// Share code to create targets, settings, dependencies,
-/// Create your own conventions, e.g: a func that makes sure all shared targets are "static frameworks"
-/// See https://docs.tuist.io/guides/helpers/
+// More info: https://tuist.io/docs/architectures/microfeatures/
+
+public enum uFeatureTarget: CaseIterable {
+    case framework
+    case tests
+    case example
+    case testing
+    
+    public static var set: Set<uFeatureTarget> { Set(allCases) }
+}
 
 extension Project {
-    /// Helper function to create the Project for this ExampleApp
-    public static func app(name: String, platform: Platform, additionalTargets: [String]) -> Project {
-        var targets = makeAppTargets(name: name,
-                                     platform: platform,
-                                     dependencies: additionalTargets.map { TargetDependency.target(name: $0) })
-        targets += additionalTargets.flatMap({ makeFrameworkTargets(name: $0, platform: platform) })
-        return Project(name: name,
-                       organizationName: "tuist.io",
-                       targets: targets)
-    }
-
-    // MARK: - Private
-
-    /// Helper function to create a framework target and an associated unit test target
-    private static func makeFrameworkTargets(name: String, platform: Platform) -> [Target] {
-        let sources = Target(name: name,
-                platform: platform,
-                product: .framework,
-                bundleId: "io.tuist.\(name)",
-                infoPlist: .default,
-                sources: ["Targets/\(name)/Sources/**"],
-                resources: [],
-                dependencies: [])
-        let tests = Target(name: "\(name)Tests",
-                platform: platform,
-                product: .unitTests,
-                bundleId: "io.tuist.\(name)Tests",
-                infoPlist: .default,
-                sources: ["Targets/\(name)/Tests/**"],
-                resources: [],
-                dependencies: [.target(name: name)])
-        return [sources, tests]
-    }
-
-    /// Helper function to create the application target and the unit test target.
-    private static func makeAppTargets(name: String, platform: Platform, dependencies: [TargetDependency]) -> [Target] {
-        let platform: Platform = platform
-        let infoPlist: [String: InfoPlist.Value] = [
-            "CFBundleShortVersionString": "1.0",
-            "CFBundleVersion": "1",
-            "UIMainStoryboardFile": "",
-            "UILaunchStoryboardName": "LaunchScreen"
-            ]
-
-        let mainTarget = Target(
-            name: name,
-            platform: platform,
-            product: .app,
-            bundleId: "io.tuist.\(name)",
-            infoPlist: .extendingDefault(with: infoPlist),
-            sources: ["Targets/\(name)/Sources/**"],
-            resources: ["Targets/\(name)/Resources/**"],
-            dependencies: dependencies
-        )
-
-        let testTarget = Target(
-            name: "\(name)Tests",
-            platform: platform,
-            product: .unitTests,
-            bundleId: "io.tuist.\(name)Tests",
-            infoPlist: .default,
-            sources: ["Targets/\(name)/Tests/**"],
-            dependencies: [
-                .target(name: "\(name)")
+    public static func framework(name: String,
+                                 product: Product = .framework,
+                                 targets: Set<uFeatureTarget>,
+                                 actions: [ProjectDescription.TargetAction] = [],
+                                 packages: [Package] = [],
+                                 externalDependencies: [TargetDependency] = [],
+                                 featureDependencies: [String] = [],
+                                 coreDependencies: [String] = [],
+                                 testingDependencies: [String] = [],
+                                 sdks: [String] = [],
+                                 sources: [String] = [],
+                                 resources: ResourceFileElements? = nil,
+                                 testingResources: ResourceFileElements? = nil,
+                                 headers: Headers? = nil,
+                                 settings: SettingsDictionary = [:],
+                                 withPublicResources: Bool = false,
+                                 additionalPlistRows: [String: ProjectDescription.InfoPlist.Value] = [:]) -> Project {
+        let configurations: [CustomConfiguration] = [
+            .debug(
+                name: "Debug",
+                settings: SettingsDictionary()
+                    .merging(settings)),
+            .release(
+                name: "Release",
+                settings: SettingsDictionary()
+                    .merging(settings)),
+        ]
+        
+        let testsDependencies: [TargetDependency] = [
+            .target(name: "\(name)Testing"),
+            .xctest,
+        ]
+        
+        // Target dependencies
+        var targetDependencies: [TargetDependency] = []
+        
+        targetDependencies.append(contentsOf: externalDependencies)
+        
+        featureDependencies.forEach {
+            targetDependencies.append(.project(target: $0, path: .relativeToRoot("Qoyan/Feature/\($0)")))
+        }
+        
+        coreDependencies.forEach {
+            targetDependencies.append(.project(target: $0, path: .relativeToRoot("Qoyan/Core/\($0)")))
+        }
+        
+        targetDependencies.append(contentsOf: sdks.map { .sdk(name: $0) })
+        
+        var commonRows: [String: ProjectDescription.InfoPlist.Value] = [
+            "CFBundleLocalizations": ["en"],
+        ]
+        commonRows = commonRows.merging(additionalPlistRows) { $1 }
+        
+        let testingDependecies = targetDependencies + testingDependencies.map {
+            .project(target: $0, path: .relativeToRoot("Qoyan/Feature/\($0)"))
+        }
+        
+        // Project targets
+        var projectTargets: [Target] = []
+        let frameworkSources = SourceFilesList(globs: sources + [
+            "Sources/**/*.swift",
+            "SupportingFiles/**/*.swift",
         ])
-        return [mainTarget, testTarget]
+        
+        if targets.contains(.framework) {
+            projectTargets.append(Target(
+                                    name: name,
+                                    platform: .iOS,
+                                    product: product,
+                                    bundleId: "com.qoyan.\(name)",
+                                    deploymentTarget: .iOS(targetVersion: "14.0", devices: [.iphone]),
+                                    infoPlist: InfoPlist.extendingDefault(with: commonRows),
+                                    sources: frameworkSources,
+                                    resources: resources,
+                                    headers: headers,
+                                    actions: [] + actions,
+                                    dependencies: targetDependencies,
+                                    settings: Settings(
+                                        base: [
+                                            "CODE_SIGN_IDENTITY": "",
+                                            "CODE_SIGNING_REQUIRED": "NO",
+                                            "CODE_SIGN_ENTITLEMENTS": "",
+                                            "CODE_SIGNING_ALLOWED": "NO",
+                                        ],
+                                        configurations: configurations,
+                                        defaultSettings: .recommended)))
+        }
+        
+        if targets.contains(.testing) {
+            projectTargets.append(Target(
+                                    name: "\(name)Testing",
+                                    platform: .iOS,
+                                    product: .framework,
+                                    bundleId: "com.qoyan.\(name)Testing",
+                                    infoPlist: .default,
+                                    sources: SourceFilesList(globs: [
+                                        SourceFileGlob("Testing/**")
+                                    ]),
+                                    resources: testingResources,
+                                    actions: [],
+                                    dependencies: testingDependecies + [.target(name: "\(name)")],
+                                    settings: Settings(configurations: configurations,
+                                                       defaultSettings: .recommended)))
+        }
+        
+        if targets.contains(.tests) {
+            projectTargets.append(Target(
+                                    name: "\(name)Tests",
+                                    platform: .iOS,
+                                    product: .unitTests,
+                                    bundleId: "com.qoyan.\(name)Tests",
+                                    infoPlist: .default,
+                                    sources: "Tests/**/*.swift",
+                                    dependencies: targetDependencies + testsDependencies,
+                                    settings: Settings(configurations: configurations,
+                                                       defaultSettings: .recommended)))
+        }
+        
+        if targets.contains(.example) {
+            projectTargets.append(Target(
+                                    name: "\(name)Example",
+                                    platform: .iOS,
+                                    product: .app,
+                                    bundleId: "com.qoyan.\(name)Example",
+                                    infoPlist: .default,
+                                    sources: "Example/**/*.swift",
+                                    resources: resources,
+                                    dependencies: [.target(name: "\(name)Testing")],
+                                    settings: Settings(configurations: configurations,
+                                                       defaultSettings: .recommended)))
+        }
+        
+        // Project
+        return Project(
+            name: name,
+            packages: packages,
+            settings: Settings(configurations: configurations),
+            targets: projectTargets)
     }
 }
