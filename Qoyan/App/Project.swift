@@ -10,7 +10,7 @@ let iosTarget = Target(
     platform: .iOS,
     product: .app,
     bundleId: "io.qoyan.app",
-    infoPlist: .file(path: .relativeToCurrentFile("/Users/wojciechkonury/Desktop/App/Qoyan/App/Supporting Files/Info.plist")),
+    infoPlist: .file(path: .relativeToCurrentFile("Supporting Files/Info.plist")),
     sources: ["Sources/**"],
     resources: ["Resources/**"],
     dependencies: [
