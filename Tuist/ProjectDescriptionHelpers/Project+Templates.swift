@@ -5,7 +5,6 @@ import ProjectDescription
 public enum uFeatureTarget: CaseIterable {
     case framework
     case tests
-    case example
     case testing
     
     public static var set: Set<uFeatureTarget> { Set(allCases) }
@@ -126,20 +125,6 @@ extension Project {
                                     infoPlist: .default,
                                     sources: "Tests/**/*.swift",
                                     dependencies: targetDependencies + testsDependencies,
-                                    settings: Settings(configurations: configurations,
-                                                       defaultSettings: .recommended)))
-        }
-        
-        if targets.contains(.example) {
-            projectTargets.append(Target(
-                                    name: "\(name)Example",
-                                    platform: .iOS,
-                                    product: .app,
-                                    bundleId: "com.qoyan.\(name)Example",
-                                    infoPlist: .default,
-                                    sources: "Example/**/*.swift",
-                                    resources: resources,
-                                    dependencies: [.target(name: "\(name)Testing")],
                                     settings: Settings(configurations: configurations,
                                                        defaultSettings: .recommended)))
         }

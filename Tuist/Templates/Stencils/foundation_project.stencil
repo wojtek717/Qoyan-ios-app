@@ -1,0 +1,15 @@
+import ProjectDescription
+import ProjectDescriptionHelpers
+
+let project = Project.framework(
+    name: "{{ name }}",
+    targets: uFeatureTarget.foundation,
+    actions: [],
+    packages: [],
+    externalDependencies: [],
+    internalDependencies: [],
+    sdks: [],
+    resources: [],
+    withPublicResources: false,
+    additionalPlistRows: [:])
+
