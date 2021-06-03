@@ -3,5 +3,9 @@ import ProjectDescriptionHelpers
 
 let workspace = Workspace(
     name: "Qoyan",
-    projects: ["Qoyan/App"]
+    projects: [
+        "Qoyan/App",
+        "Qoyan/Feature/MainScreen",
+        "Qoyan/Core/Vendors",
+    ]
 )

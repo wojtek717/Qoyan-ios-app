@@ -22,8 +22,8 @@ extension Project {
                                  testingDependencies: [String] = [],
                                  sdks: [String] = [],
                                  sources: [String] = [],
-                                 resources: ResourceFileElements? = nil,
-                                 testingResources: ResourceFileElements? = nil,
+                                 resources: [ResourceFileElement] = [],
+                                 testingResources: [ResourceFileElement] = [],
                                  headers: Headers? = nil,
                                  settings: SettingsDictionary = [:],
                                  withPublicResources: Bool = false,
@@ -81,12 +81,15 @@ extension Project {
                                     platform: .iOS,
                                     product: product,
                                     bundleId: "com.qoyan.\(name)",
-                                    deploymentTarget: .iOS(targetVersion: "14.0", devices: [.iphone]),
+                                    deploymentTarget: .iOS(targetVersion: "13.0", devices: [.iphone]),
                                     infoPlist: InfoPlist.extendingDefault(with: commonRows),
                                     sources: frameworkSources,
-                                    resources: resources,
+                                    resources: ResourceFileElements(resources: resources),
                                     headers: headers,
-                                    actions: [] + actions,
+                                    actions: [
+                                        .post(
+                                            script: "tuist lint code \(name)", name: "Lint")
+                                    ] + actions,
                                     dependencies: targetDependencies,
                                     settings: Settings(
                                         base: [
@@ -94,6 +97,7 @@ extension Project {
                                             "CODE_SIGNING_REQUIRED": "NO",
                                             "CODE_SIGN_ENTITLEMENTS": "",
                                             "CODE_SIGNING_ALLOWED": "NO",
+                                            "DEVELOPMENT_TEAM": "KKG46J7UE8",
                                         ],
                                         configurations: configurations,
                                         defaultSettings: .recommended)))
@@ -109,7 +113,7 @@ extension Project {
                                     sources: SourceFilesList(globs: [
                                         SourceFileGlob("Testing/**")
                                     ]),
-                                    resources: testingResources,
+                                    resources: ResourceFileElements(resources: testingResources),
                                     actions: [],
                                     dependencies: testingDependecies + [.target(name: "\(name)")],
                                     settings: Settings(configurations: configurations,

@@ -2,14 +2,14 @@ import ProjectDescription
 import ProjectDescriptionHelpers
 
 let project = Project.framework(
-    name: "{{ name }}",
+    name: "Vendors",
     targets: uFeatureTarget.set,
     actions: [],
     packages: [
-	.package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.18.0")
+    .package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.18.0")
     ],
     externalDependencies: [
-	.package(product: "swift-composable-architecture")
+    .package(product: "ComposableArchitecture")
 ],
     featureDependencies: [],
     sdks: [],

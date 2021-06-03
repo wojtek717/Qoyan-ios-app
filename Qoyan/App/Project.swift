@@ -14,8 +14,12 @@ let iosTarget = Target(
     sources: ["Sources/**"],
     resources: ["Resources/**"],
     dependencies: [
-        /* Target dependencies can be defined here */
-        /* .framework(path: "framework") */
+        .project(
+            target: "Vendors",
+            path: .relativeToRoot("Qoyan/Core/Vendors")),
+        .project(
+            target: "MainScreen",
+            path: .relativeToRoot("Qoyan/Feature/MainScreen")),
     ]
 )
 

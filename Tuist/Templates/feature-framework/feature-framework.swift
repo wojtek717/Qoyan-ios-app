@@ -15,6 +15,7 @@ let template = Template(
     ],
     files: [
         .string(path: "Qoyan/Feature/\(nameAttribute)/Sources/\(nameAttribute).swift", contents: exampleContents),
+        .string(path: "Qoyan/Feature/\(nameAttribute)/SupportingFiles/\(nameAttribute).swift", contents: exampleContents),
         // Sources
         .file(
             path: "Qoyan/Feature/\(nameAttribute)/Project.swift",
@@ -23,4 +24,65 @@ let template = Template(
         .file(
             path: "Qoyan/Feature/\(nameAttribute)/Tests/\(nameAttribute)Tests.swift",
             templatePath: "../Stencils/tests_contents.stencil"),
+        .string(path: "Qoyan/Feature/\(nameAttribute)/Testing/\(nameAttribute)Testing.swift", contents: exampleContents),
+    ])
+
+
+
+
+
+
+import ProjectDescription
+
+let nameAttribute: Template.Attribute = .required("name")
+let template = Template(
+    description: "Feature framework template",
+    attributes: [
+        nameAttribute,
+        .optional("platform", default: "iOS"),
+    ],
+    files: [
+        // Sources
+        .file(
+            path: "Pulsetip/Feature/\(nameAttribute)/Project.swift",
+            templatePath: "Stencils/feature_project.stencil"),
+        .file(
+            path: "Pulsetip/Feature/\(nameAttribute)/Sources/\(nameAttribute)ModuleComponent.swift",
+            templatePath: "Stencils/module_component.stencil"),
+        .file(
+            path: "Pulsetip/Feature/\(nameAttribute)/Sources/Main/\(nameAttribute)Interactor.swift",
+            templatePath: "../../Stencils/CleanSwift/interactor.stencil"),
+        .file(
+            path: "Pulsetip/Feature/\(nameAttribute)/Sources/Main/\(nameAttribute)Presenter.swift",
+            templatePath: "../../Stencils/CleanSwift/presenter.stencil"),
+        .file(
+            path: "Pulsetip/Feature/\(nameAttribute)/Sources/Main/\(nameAttribute)Router.swift",
+            templatePath: "../../Stencils/CleanSwift/router.stencil"),
+        .file(
+            path: "Pulsetip/Feature/\(nameAttribute)/Sources/Main/\(nameAttribute)ViewController.swift",
+            templatePath: "../../Stencils/CleanSwift/viewController.stencil"),
+        .file(
+            path: "Pulsetip/Feature/\(nameAttribute)/Sources/Main/\(nameAttribute)ViewController.xib",
+            templatePath: "../../Stencils/CleanSwift/viewController_xib.stencil"),
+        .file(
+            path: "Pulsetip/Feature/\(nameAttribute)/Sources/Main/\(nameAttribute)Component.swift",
+            templatePath: "../../Stencils/CleanSwift/component.stencil"),
+        // Tests
+        .file(
+            path: "Pulsetip/Feature/\(nameAttribute)/Tests/\(nameAttribute)Tests.swift",
+            templatePath: "Stencils/tests_contents.stencil"),
+        // Testing
+        .file(
+            path: "Pulsetip/Feature/\(nameAttribute)/Testing/\(nameAttribute)Testing.swift",
+            templatePath: "Stencils/testing_mock_component.stencil"),
+        .string(
+            path: "Pulsetip/Feature/\(nameAttribute)/Testing/Stencils/Needle.Stencils.swift",
+            contents: ""),
+        // Example
+        .file(
+            path: "Pulsetip/Feature/\(nameAttribute)/Example/\(nameAttribute)AppDelegate.swift",
+            templatePath: "Stencils/example_app_delegate.stencil"),
+        .file(
+            path: "Pulsetip/Feature/\(nameAttribute)/Example/LaunchScreen.xib",
+            templatePath: "Stencils/launch_screen.stencil"),
     ])

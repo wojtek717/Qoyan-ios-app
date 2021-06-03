@@ -6,12 +6,19 @@
 //
 
 import SwiftUI
+import Vendors
+import ComposableArchitecture
+import MainScreen
 
 @main
 struct QoyanApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            MainScreen(
+                store: Store(
+                    initialState: RootState(),
+                    reducer: rootReducer,
+                    environment: RootEnvironment()))
         }
     }
 }
