@@ -2,19 +2,14 @@ import ProjectDescription
 import ProjectDescriptionHelpers
 
 let project = Project.framework(
-    name: "MainScreen",
-    targets: uFeatureTarget.set,
-    actions: [],
-    packages: [],
-    externalDependencies: [],
+    name: "QoyanUI",
+    targets: [.framework],
     featureDependencies: [],
     coreDependencies: [
-        "Vendors",
-        "QoyanUI"
+        "Vendors"
     ],
-    sdks: [],
     resources: [
         .glob(pattern: "**/*.xib"),
+        .glob(pattern: "Resources/**"),
     ],
-    additionalPlistRows: [:])
-
+    withPublicResources: true)

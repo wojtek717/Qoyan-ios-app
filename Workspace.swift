@@ -7,5 +7,6 @@ let workspace = Workspace(
         "Qoyan/App",
         "Qoyan/Feature/MainScreen",
         "Qoyan/Core/Vendors",
+        "Qoyan/Core/QoyanUI",
     ]
 )

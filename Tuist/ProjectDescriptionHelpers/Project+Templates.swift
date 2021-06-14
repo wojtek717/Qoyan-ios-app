@@ -81,7 +81,7 @@ extension Project {
                                     platform: .iOS,
                                     product: product,
                                     bundleId: "com.qoyan.\(name)",
-                                    deploymentTarget: .iOS(targetVersion: "13.0", devices: [.iphone]),
+                                    deploymentTarget: .iOS(targetVersion: "14.0", devices: [.iphone]),
                                     infoPlist: InfoPlist.extendingDefault(with: commonRows),
                                     sources: frameworkSources,
                                     resources: ResourceFileElements(resources: resources),

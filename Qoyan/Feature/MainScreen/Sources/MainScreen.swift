@@ -9,6 +9,7 @@
 import SwiftUI
 import Vendors
 import ComposableArchitecture
+import QoyanUI
 
 public struct MainScreen: View {
     let store: Store<RootState, RootAction>
@@ -19,14 +20,24 @@ public struct MainScreen: View {
     
     public var body: some View {
         WithViewStore(self.store) { viewStore in
-            Circle()
-                .fill(Color.blue)
-                .frame(
-                    width: 100,
-                    height: 100,
-                    alignment: .center)
-                .padding()
-                .onAppear { viewStore.send(.onAppear) }
+            VStack {
+                Text("Current Hydration")
+                    .font(Font(QoyanUI.QoyanUIFontFamily.RoundedMplus1c.regular.font(size: 25.0)))
+                    .foregroundColor(Color(QoyanUI.QoyanUIAsset.purpleDark.color))
+                    .padding(.bottom, 25)
+                
+                IntakeView(store: self.store.scope(
+                            state: \.intakeState,
+                            action: RootAction.intakeAction))
+                Spacer()
+                
+                AmountPickerView(store: self.store.scope(
+                                    state: \.amountPickerState,
+                                    action: RootAction.amountPickerAction))
+                    .padding(.horizontal, 35)
+
+            }
+            .padding()
         }
     }
 }
@@ -34,8 +45,8 @@ public struct MainScreen: View {
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         MainScreen(store: .init(
-                        initialState: RootState(),
-                        reducer: rootReducer,
-                        environment: RootEnvironment()))
+                    initialState: RootState(),
+                    reducer: rootReducer,
+                    environment: RootEnvironment()))
     }
 }
