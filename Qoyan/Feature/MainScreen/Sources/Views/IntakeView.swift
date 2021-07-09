@@ -134,8 +134,10 @@ public struct IntakeView: View {
                         .foregroundColor(Color(QoyanUI.QoyanUIAsset.purpleGray.color))
                 }
             }
-            .onReceive(Publishers.keyboardHeight, perform: {
-                self.keyboardHeight = $0
+            .onReceive(Publishers.keyboardHeight, perform: { height in
+                withAnimation {
+                    self.keyboardHeight = height
+                }
             })
         }
         

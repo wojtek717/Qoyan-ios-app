@@ -15,11 +15,13 @@ public struct RootState: Equatable {
     
     var intakeState = IntakeState()
     var amountPickerState = AmountPickerState()
+    var hydrationState = HydrationState()
 }
 
 public enum RootAction: Equatable {
     case intakeAction(IntakeAction)
     case amountPickerAction(AmountPickerAction)
+    case hydrationAction(HydrationAction)
     
     case onAppear
 }
@@ -34,9 +36,9 @@ public let rootReducer = Reducer<RootState, RootAction, RootEnvironment>.combine
         case .onAppear:
             state = .init()
             return .none
-        case .amountPickerAction(.addButtonTapped):
-            state.intakeState.intakeCurrent += Int(state.amountPickerState.intakeValue)
-            return .none
+//        case .amountPickerAction(.addButtonTapped):
+//            state.intakeState.intakeCurrent += Int(state.amountPickerState.intakeValue)
+//            return .none
         default:
             return .none
         }
@@ -49,6 +51,11 @@ public let rootReducer = Reducer<RootState, RootAction, RootEnvironment>.combine
     amountPickerReducer.pullback(
         state: \.amountPickerState,
         action: /RootAction.amountPickerAction,
+        environment: { _ in .init() }),
+    
+    hydrationReducer.pullback(
+        state: \.hydrationState,
+        action: /RootAction.hydrationAction,
         environment: { _ in .init() })
 ).debug()
 

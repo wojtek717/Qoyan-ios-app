@@ -16,28 +16,34 @@ public struct MainScreen: View {
     
     public init(store: Store<RootState, RootAction>) {
         self.store = store
+        
+        UITabBar.appearance().backgroundColor = UIColor(Color(QoyanUI.QoyanUIAsset.purpleBackground.color))
     }
     
     public var body: some View {
         WithViewStore(self.store) { viewStore in
-            VStack {
-                Text("Current Hydration")
-                    .font(Font(QoyanUI.QoyanUIFontFamily.RoundedMplus1c.regular.font(size: 25.0)))
-                    .foregroundColor(Color(QoyanUI.QoyanUIAsset.purpleDark.color))
-                    .padding(.bottom, 25)
-                
-                IntakeView(store: self.store.scope(
-                            state: \.intakeState,
-                            action: RootAction.intakeAction))
-                Spacer()
-                
-                AmountPickerView(store: self.store.scope(
-                                    state: \.amountPickerState,
-                                    action: RootAction.amountPickerAction))
-                    .padding(.horizontal, 35)
-
+            
+            TabView {
+                HydrationView(store: self.store.scope(
+                                state: \.hydrationState,
+                                action: RootAction.hydrationAction))
+                    .tabItem {
+                        Image(systemName: "heart.fill")
+                        Text("Favourites")
+                    }
+                Text("Friends Screen")
+                    .tabItem {
+                        Image(systemName: "person.fill")
+                        Text("Friends")
+                    }
+                Text("Nearby Screen")
+                    .tabItem {
+                        Image(systemName: "mappin.circle.fill")
+                        Text("Nearby")
+                    }
+                    .background(Color.yellow)
             }
-            .padding()
+            .accentColor(Color(QoyanUIAsset.purpleLight.color))
         }
     }
 }
